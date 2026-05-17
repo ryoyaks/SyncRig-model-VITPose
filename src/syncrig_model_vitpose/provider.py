@@ -73,8 +73,8 @@ class VitPoseProvider(Provider):
                 "Apache 2.0 weights + code; person detector is torchvision "
                 "FasterRCNN (BSD-3). Commercial use unrestricted."
             ),
-            user_label="ViTPose",
-            user_tagline="2D pose, no mesh · commercial-safe · lightweight",
+            user_label="ViTPose · 2D pose, commercial-safe",
+            user_tagline="Lightweight body skeleton, no mesh",
             config_schema=(
                 ProviderConfigField(
                     name="depth",
