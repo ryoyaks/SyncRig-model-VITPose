@@ -1,13 +1,17 @@
 [project]
 name = "syncrig-model-vitpose"
-version = "0.1.0"
+version = "0.2.0"
 description = "ViTPose provider plug-in for SyncRig (Apache 2.0)"
 license = "Apache-2.0"
 license-files = ["LICENSE"]
 requires-python = ">=3.10,<3.13"
 dependencies = [
-    "syncrig-core>=0.1.0",
-    "syncrig-engine>=0.1.0",
+    # ``syncrig-core>=0.3`` is the version that ships the plugin SDK +
+    # ``syncrig_core.providers.helpers`` (require_modules / silence_stdout
+    # / BackgroundWarmup). Pinning here means a fresh git-URL install
+    # via the Extensions tab on an older engine refuses cleanly.
+    "syncrig-core>=0.3",
+    "syncrig-engine>=0.3",
 ]
 
 [project.optional-dependencies]

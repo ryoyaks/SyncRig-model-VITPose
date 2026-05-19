@@ -14,17 +14,19 @@ inference on each bbox.
 
 from __future__ import annotations
 
-import importlib.util as _ilu
+from syncrig_core.providers.helpers import require_modules
 
-for _required in ("torch", "torchvision", "transformers", "PIL"):
-    if _ilu.find_spec(_required) is None:
-        raise ImportError(
-            f"syncrig-model-vitpose requires its install extras "
-            f"(missing module: {_required}). Run "
-            "`uv pip install 'syncrig-model-vitpose[runtime]'` or "
-            "`pip install syncrig-model-vitpose[runtime]` to pull "
-            "torch + torchvision + transformers."
-        )
+# Raise at module-top when the runtime extras aren't installed. The
+# error message points at the canonical install command; the engine's
+# entry-point autoloader catches this and surfaces the plugin under
+# ``ep:vitpose`` (unavailable) so the Extensions UI's
+# ``FailedEntryPointCard`` tells the user to re-install via the git
+# URL field (which auto-installs ``[runtime]`` extras as of v0.3).
+require_modules(
+    ("torch", "torchvision", "transformers", "PIL"),
+    pkg="syncrig-model-vitpose",
+    install_command="pip install 'syncrig-model-vitpose[runtime]'",
+)
 
 import logging
 from typing import TYPE_CHECKING
@@ -61,9 +63,10 @@ class VitPoseProvider(Provider):
             skeleton_topology=SkeletonTopology.COCO_17,
             outputs=frozenset({OutputKind.SKELETON}),
             requires_gpu=True,  # CPU works but very slow
-            # External pip package — no uv-sync extra. Engine still
-            # reports an install hint, but the install_steps below point
-            # at ``pip install`` instead of ``uv sync --extra``.
+            # External pip package — no uv-sync extra. The git-URL
+            # installer (v0.3 plugin SDK) auto-installs ``[runtime]``
+            # extras so there's no separate Extensions install button
+            # to wire up; ``install_steps()`` stays empty.
             requires_extra=None,
             fps_estimate=20,
             device_kinds=frozenset({"cuda", "cpu"}),
@@ -75,6 +78,14 @@ class VitPoseProvider(Provider):
             ),
             user_label="ViTPose · 2D pose, commercial-safe",
             user_tagline="Lightweight body skeleton, no mesh",
+            # v0.3 plugin SDK metadata — surfaces on the Extensions
+            # card header + inside the git-install confirm modal.
+            version="0.2.0",
+            repository_url="https://github.com/ryoyaks/SyncRig-model-VITPose",
+            homepage="https://huggingface.co/usyd-community/vitpose-base-simple",
+            author="@ryoyaks",
+            license="Apache-2.0",
+            tags=frozenset({"body", "skeleton", "2d", "transformer"}),
             config_schema=(
                 ProviderConfigField(
                     name="depth",
